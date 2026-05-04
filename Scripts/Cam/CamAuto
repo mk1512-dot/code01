@@ -1,0 +1,20 @@
+void Start()
+{
+    SetupCameraBounds();
+    InvokeRepeating(nameof(SpawnCoin), 1f, spawnInterval);
+}
+
+void SetupCameraBounds()
+{
+    Camera cam = Camera.main;
+
+    float height = cam.orthographicSize;
+    float width = height * cam.aspect;
+
+    Vector3 camPos = cam.transform.position;
+
+    minX = camPos.x - width;
+    maxX = camPos.x + width;
+
+    spawnY = camPos.y + height + topOffset;
+}
