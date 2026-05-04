@@ -1,0 +1,75 @@
+using UnityEngine;
+using System.Collections;
+
+public class CoinSpawner : MonoBehaviour
+{
+    [Header("Prefab")]
+    [SerializeField] GameObject coinPrefab;
+
+    [Header("Spawn Time")]
+    [SerializeField] float minSpawnTime = 0.5f;
+    [SerializeField] float maxSpawnTime = 1.5f;
+
+    [Header("Camera Bounds")]
+    [SerializeField] float topOffset = 1f;
+
+    float minX, maxX, spawnY;
+
+    Coroutine spawnRoutine;
+
+    void Start()
+    {
+        SetupCameraBounds();
+
+        spawnRoutine = StartCoroutine(SpawnRoutine());
+    }
+
+    void SetupCameraBounds()
+    {
+        Camera cam = Camera.main;
+
+        float height = cam.orthographicSize;
+        float width = height * cam.aspect;
+
+        Vector3 camPos = cam.transform.position;
+
+        minX = camPos.x - width;
+        maxX = camPos.x + width;
+        spawnY = camPos.y + height + topOffset;
+    }
+
+    IEnumerator SpawnRoutine()
+    {
+        while (true)
+        {
+            SpawnCoin();
+
+            float waitTime = Random.Range(minSpawnTime, maxSpawnTime);
+
+            yield return new WaitForSeconds(waitTime);
+        }
+    }
+
+    void SpawnCoin()
+    {
+        float randomX = Random.Range(minX, maxX);
+        Vector2 spawnPos = new Vector2(randomX, spawnY);
+
+        Instantiate(coinPrefab, spawnPos, Quaternion.identity);
+    }
+
+    // 👉 Dừng spawn
+    public void StopSpawn()
+    {
+        if (spawnRoutine != null)
+        {
+            StopCoroutine(spawnRoutine);
+        }
+    }
+
+    // 👉 Resume spawn
+    public void StartSpawn()
+    {
+        spawnRoutine = StartCoroutine(SpawnRoutine());
+    }
+}
