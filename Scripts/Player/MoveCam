@@ -1,21 +1,28 @@
-using Unity.Mathematics;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerScript : MonoBehaviour
 {
-    bool canMove = true;
-    [SerializeField] float moveSpeed;
-    float InputX;
     Rigidbody2D rb;
+    [SerializeField] float MoveSpeed;
     Vector2 minBounds;
     Vector2 maxBounds;
-    bool CanMoveGameOver = true;
+    float halfWidth;
+    float halfHeight;
+    float InputX;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        
+
     }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
+    {
+        SetupCam();
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        halfWidth = sr.bounds.extents.x;
+        halfHeight = sr.bounds.extents.y;
+    }
+    void SetupCam()
     {
         Camera cam = Camera.main;
         float hight = cam.orthographicSize;
@@ -24,47 +31,35 @@ public class PlayerController : MonoBehaviour
         minBounds = new Vector2(campos.x - wight, campos.y - hight);
         maxBounds = new Vector2(campos.x + wight, campos.y + hight);
     }
+
+    // Update is called once per frame
     void Update()
     {
-        if (CanMoveGameOver == false)
-        {
-            return;
-        }
         InputX = Input.GetAxis("Horizontal");
     }
     private void FixedUpdate()
     {
-        if (CanMoveGameOver == false)
-        {
-            return;
-        }
         Move();
+        ClampPosition();
     }
     void Move()
     {
-        
-        rb.linearVelocity = new Vector2(InputX * moveSpeed, rb.linearVelocity.y);
+
+        rb.linearVelocity = new Vector2(InputX * MoveSpeed, rb.linearVelocity.y);
+    }
+    void ClampPosition()
+    {
         Vector2 pos = rb.position;
-        pos.x = Mathf.Clamp(pos.x, minBounds.x, maxBounds.x);
-        pos.y = Mathf.Clamp(pos.y, minBounds.y, maxBounds.y);
+        pos.x = Mathf.Clamp(pos.x, minBounds.x + halfWidth, maxBounds.x - halfWidth);
+        pos.y = Mathf.Clamp(pos.y,
+                            minBounds.y + halfHeight,
+                            maxBounds.y - halfHeight);
         rb.position = pos;
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Coin"))
-        {
-            CoinScoreScript coinScoreScript = collision.GetComponent<CoinScoreScript>();
-            
-            if (coinScoreScript != null)
-            {
-                coinScoreScript.collect();
-                
-            }
+        if (collision.gameObject.CompareTag("enemy")){
+            Debug.Log("Game Over");
         }
-    }
-    public void gameOverMove()
-    {
-        CanMoveGameOver = false;
-        rb.linearVelocity = Vector2.zero;
     }
 }
