@@ -1,0 +1,25 @@
+using UnityEngine;
+
+public class TiltController : MonoBehaviour
+{
+    public Rigidbody2D rb;
+
+    public float moveSpeed = 5f;
+
+    void FixedUpdate()
+    {
+        float tilt = Input.acceleration.x;
+
+        if (Mathf.Abs(tilt) < 0.1f)
+        {
+            tilt = 0;
+        }
+
+        rb.velocity =
+            new Vector2
+            (
+                tilt * moveSpeed,
+                rb.velocity.y
+            );
+    }
+}
