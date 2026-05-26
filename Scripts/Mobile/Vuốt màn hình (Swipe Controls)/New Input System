@@ -1,0 +1,65 @@
+using UnityEngine;
+using UnityEngine.InputSystem.EnhancedTouch;
+
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
+
+public class SwipeControl : MonoBehaviour
+{
+    private Vector2 startPos;
+    private Vector2 endPos;
+
+    public float minSwipeDistance = 100f;
+
+    private void Awake()
+    {
+        EnhancedTouchSupport.Enable();
+    }
+
+    private void Update()
+    {
+        if (Touch.activeTouches.Count <= 0)
+            return;
+
+        Touch touch = Touch.activeTouches[0];
+
+        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+        {
+            startPos = touch.screenPosition;
+        }
+
+        if (touch.phase == UnityEngine.InputSystem.TouchPhase.Ended)
+        {
+            endPos = touch.screenPosition;
+
+            Vector2 swipe = endPos - startPos;
+
+            if (swipe.magnitude < minSwipeDistance)
+                return;
+
+            swipe.Normalize();
+
+            if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
+            {
+                if (swipe.x > 0)
+                {
+                    Debug.Log("Swipe Right");
+                }
+                else
+                {
+                    Debug.Log("Swipe Left");
+                }
+            }
+            else
+            {
+                if (swipe.y > 0)
+                {
+                    Debug.Log("Swipe Up");
+                }
+                else
+                {
+                    Debug.Log("Swipe Down");
+                }
+            }
+        }
+    }
+}
