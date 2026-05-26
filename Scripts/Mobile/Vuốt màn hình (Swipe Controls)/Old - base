@@ -5,6 +5,8 @@ public class SwipeControl : MonoBehaviour
     private Vector2 startPos;
     private Vector2 endPos;
 
+    public float minSwipeDistance = 100f;
+
     void Update()
     {
         if (Input.touchCount <= 0) return;
@@ -22,7 +24,35 @@ public class SwipeControl : MonoBehaviour
 
             Vector2 swipe = endPos - startPos;
 
-            Debug.Log(swipe);
+            if (swipe.magnitude < minSwipeDistance)
+            {
+                return;
+            }
+
+            swipe.Normalize();
+
+            if (Mathf.Abs(swipe.x) > Mathf.Abs(swipe.y))
+            {
+                if (swipe.x > 0)
+                {
+                    Debug.Log("Swipe Right");
+                }
+                else
+                {
+                    Debug.Log("Swipe Left");
+                }
+            }
+            else
+            {
+                if (swipe.y > 0)
+                {
+                    Debug.Log("Swipe Up");
+                }
+                else
+                {
+                    Debug.Log("Swipe Down");
+                }
+            }
         }
     }
 }
